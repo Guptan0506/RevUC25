@@ -1,0 +1,39 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import io from "socket.io-client";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import Chat from "./pages/Chat";
+
+const socket = io("http://localhost:5000"); // Adjust for your backend URL
+
+function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+    }
+  }, []);
+
+  return (
+    <Router>
+      <Navbar user={user} setUser={setUser} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/signup" element={<Signup setUser={setUser} />} />
+        <Route path="/dashboard" element={<Dashboard user={user} />} />
+        <Route path="/profile/:id" element={<Profile />} />
+        <Route path="/chat" element={<Chat socket={socket} user={user} />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
